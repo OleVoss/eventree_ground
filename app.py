@@ -1,11 +1,12 @@
 import customtkinter
 from PIL import Image
+from threading import Thread
 
 
 class App(customtkinter.CTk):
     def __init__(self):
         super().__init__()
-        self.attributes("-fullscreen", True)
+        self.attributes("-fullscreen", False)
 
         self.title("inventree scanner")
         self.geometry("800x480")
@@ -36,6 +37,19 @@ class PartDisplay(customtkinter.CTkFrame):
         self.info_frame.grid(row=0, column=1, padx=(
             5, 10), pady=(10, 5), sticky="news")
 
+        self.data = "test"
+        self.info_data = customtkinter.CTkLabel(
+            self.info_frame, text=self.data)
+        self.info_data.grid()
+
         self.util_frame = customtkinter.CTkFrame(self)
         self.util_frame.grid(row=1, padx=10, pady=(5, 10),
                              sticky="ews", columnspan=2)
+
+        master.bind("<Key>", self.get_input)
+
+        print("rdy")
+
+    def get_input(self, event):
+        self.info_data.configure(text=event.char)
+        print("event")
