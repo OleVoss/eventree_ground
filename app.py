@@ -1,5 +1,8 @@
 import customtkinter
 from PIL import Image
+from imageio import imread
+import requests
+import io
 
 from inventree.part import Part
 from inventree.stock import StockItem, StockLocation
@@ -32,13 +35,17 @@ class App(customtkinter.CTk):
         if event.char in "0123456789":
             self.part_code += event.char
         else:
-            self.part_frame.set_part_details(self.part_code)
             self.part_code = ""
             item_data = self.api.get("/stock/82")
-            self.set_new_stock_item(item_data)
+            part_data = self.api.get("/part/82")
+            img_path = part_data["image"]
+            img_path = "https://demo.inventree.org" + img_path
+            r = requests.get(img_path, stream=True)
+            img = Image.open(io.BytesIO(r.content))
+            self.set_new_stock_item(item_data, img)
 
-    def set_new_stock_item(self, item_data):
-        print(item_data)
+    def set_new_stock_item(self, item_data, img):
+        self.part_frame.set_part_details(item_data, img)
 
 
 class PartDisplay(customtkinter.CTkFrame):
@@ -66,5 +73,10 @@ class PartDisplay(customtkinter.CTkFrame):
         self.util_frame.grid(row=1, padx=10, pady=(5, 10),
                              sticky="ews", columnspan=2)
 
-    def set_part_details(self, id):
+        self.image_label = customtkinter.CTkLabel(self.image_frame)
+        self.image_label.grid()
+
+    def set_part_details(self, id, image):
         self.info_data.configure(text=id)
+        image = customtkinter.CTkImage(light_image=image, size=(50, 50))
+        self.image_label.configure(image=image)
