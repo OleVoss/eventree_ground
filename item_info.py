@@ -2,6 +2,28 @@ from inventree.api import InvenTreeAPI
 import api_utils
 
 
+class DetailInfo:
+    NAME = "Name"
+    DESCRIPTION = "Description"
+    SERIAL_NO = "Serial No."
+    DEFAULT_LOCATION = "Default location"
+    NOTES = "Notes"
+    NOTE_WARN = "Note warn"
+    CURRENTLY_IN_STOCK = "Currently in stock"
+    TOTAL_IN_STOCK = "Total in stock"
+
+    ALL_DETAILS = [
+        NAME,
+        DESCRIPTION,
+        SERIAL_NO,
+        DEFAULT_LOCATION,
+        NOTES,
+        NOTE_WARN,
+        CURRENTLY_IN_STOCK,
+        TOTAL_IN_STOCK,
+    ]
+
+
 class ItemInfo:
     @staticmethod
     def from_api(api: InvenTreeAPI, stock_item_pk: str):
@@ -27,3 +49,18 @@ class ItemInfo:
         self.total_in_stock = part["total_in_stock"]
 
         self.img_path = part["image"]
+
+        self.details = {
+            DetailInfo.NAME: self.name,
+            DetailInfo.DESCRIPTION: self.description,
+            DetailInfo.SERIAL_NO: self.serial,
+            DetailInfo.DEFAULT_LOCATION: self.default_location,
+            DetailInfo.NOTES: self.notes,
+            DetailInfo.NOTE_WARN: self.note_warn,
+            DetailInfo.CURRENTLY_IN_STOCK: self.stock_item_count,
+            DetailInfo.TOTAL_IN_STOCK: self.total_in_stock,
+        }
+
+    # use DetailInfo consts as names
+    def get_detail(self, name: str):
+        return self.details.get(name)
